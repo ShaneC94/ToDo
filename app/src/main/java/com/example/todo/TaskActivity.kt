@@ -43,6 +43,7 @@ class TaskActivity : AppCompatActivity() {
         val backButton = findViewById<Button>(R.id.backButton)
         val saveButton = findViewById<Button>(R.id.saveButton)
         val titleInput = findViewById<TextInputEditText>(R.id.editTitle)
+        val dateInput = findViewById<TextInputEditText>(R.id.editDeadlineDate)
         // The user does a normal click and is navigated back
 //        doneButton.setOnClickListener {
 //            val intent = Intent(this, MainActivity::class.java)
@@ -56,8 +57,10 @@ class TaskActivity : AppCompatActivity() {
         }
         saveButton.setOnClickListener {
             val taskTitle = titleInput.text.toString().trim()
-            if (taskTitle.isNotEmpty()) {
+            val taskDate = dateInput.text.toString().trim()
+            if(taskTitle.isNotEmpty()) {
                 MainActivity.tasks.add(taskTitle)
+                MainActivity.taskDates.add(taskDate)
             }
             val intent = Intent(this, MainActivity::class.java)
             startActivity(intent)
