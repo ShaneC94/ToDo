@@ -16,7 +16,6 @@ import org.w3c.dom.Text
 class MainActivity : AppCompatActivity() {
     companion object {
         val tasks = mutableListOf<String>()
-        val taskDates = mutableListOf<String>()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -24,9 +23,9 @@ class MainActivity : AppCompatActivity() {
         enableEdgeToEdge()
         setContentView(R.layout.activity_main)
 
-        val searchView : SearchView = findViewById(R.id.searchView)
+        val searchView = findViewById<SearchView>(R.id.searchView)
         val searchEditText = searchView.findViewById<EditText>(androidx.appcompat.R.id.search_src_text)
-        val fab : FloatingActionButton = findViewById(R.id.taskFab)
+        val fab = findViewById<FloatingActionButton>(R.id.taskFab)
 
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
@@ -50,7 +49,7 @@ class MainActivity : AppCompatActivity() {
     override fun onResume(){
         super.onResume()
 
-        val taskListView: LinearLayout = findViewById(R.id.taskList)
+        val taskListView = findViewById<LinearLayout>(R.id.taskList)
 
         taskListView.removeAllViews()
         for (task in tasks) {
