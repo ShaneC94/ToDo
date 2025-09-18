@@ -3,17 +3,11 @@ package com.example.todo
 import android.app.DatePickerDialog
 import android.content.Intent
 import android.icu.util.Calendar
-import android.icu.util.TimeZone
 import android.os.Bundle
-import android.os.PersistableBundle
 import android.widget.Button
-import android.widget.EditText
 import androidx.appcompat.app.AppCompatActivity
-import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.textfield.TextInputLayout
 import com.google.android.material.textfield.TextInputEditText
-import java.text.SimpleDateFormat
-import java.util.Locale
 
 class TaskActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -35,7 +29,6 @@ class TaskActivity : AppCompatActivity() {
                 val selectedDate = "${selYear}/${selMonth + 1}/${selDay}"
                 deadlineInput.setText(selectedDate)
             }, year, month, day)
-
             datePicker.show()
         }
 
