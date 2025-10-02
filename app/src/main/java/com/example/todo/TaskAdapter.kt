@@ -39,6 +39,11 @@ class TaskAdapter(
         holder.description.text = task.description
         holder.checkBox.isChecked = task.isDone
 
+
+        //Apply background color
+        (holder.itemView as androidx.cardview.widget.CardView).setCardBackgroundColor(
+            holder.itemView.context.getColor(task.colorResId)
+        )
         //expand/collapse title
         if (expandedTitles.contains(position)) {
             holder.title.maxLines = Int.MAX_VALUE
