@@ -1,15 +1,18 @@
 *.iml
-.gradle
-/local.properties
+.idea/
+.DS_Store
+.gradle/
+local.properties
+/build/
+.cxx/
+.externalNativeBuild/
+captures/
 /.idea/caches
 /.idea/libraries
 /.idea/modules.xml
 /.idea/workspace.xml
 /.idea/navEditor.xml
 /.idea/assetWizardSettings.xml
-.DS_Store
-/build
-/captures
-.externalNativeBuild
-.cxx
-local.properties
+
+# Temp files
+ToDo_V_0.2
