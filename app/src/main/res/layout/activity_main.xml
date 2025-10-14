@@ -78,13 +78,13 @@ more efficient than manually adding them-->
         android:id="@+id/taskFab"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginEnd="36dp"
+        android:layout_marginBottom="48dp"
         android:contentDescription="Add Task"
         android:src="@android:drawable/ic_input_add"
         android:tint="@color/white"
-        app:backgroundTint="@color/meadow_accent_dark"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:backgroundTint="@color/meadow_green"
         app:layout_constraintBottom_toBottomOf="parent"
-        android:layout_margin="24dp"
-        />
+        app:layout_constraintEnd_toEndOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
