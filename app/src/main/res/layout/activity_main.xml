@@ -30,7 +30,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <!--    Search Bar - styled with material outlined-box
-    Should use hint - not queryHint as per android guidelines-->
+    Should use hint - not queryHint as per android guidelines -->
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/searchLayout"
         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
