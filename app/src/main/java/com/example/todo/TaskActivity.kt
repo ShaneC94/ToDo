@@ -1,7 +1,6 @@
 package com.example.todo
 
 import android.app.DatePickerDialog
-import android.content.Intent
 import android.icu.util.Calendar
 import android.os.Bundle
 import android.widget.Button
@@ -59,9 +58,7 @@ class TaskActivity : AppCompatActivity() {
         }
         // The user does a normal click and is navigated back without saving
         backButton.setOnClickListener {
-            val intent = Intent(this, MainActivity::class.java)
-            startActivity(intent)
-            finish()
+            finish() // go back to MainActivity without recreating it
         }
         // The user does a normal click and is navigated back with saving
         //and task generation
@@ -94,9 +91,7 @@ class TaskActivity : AppCompatActivity() {
             MainActivity.tasks.add(Task(taskTitle, taskDeadline, taskDescription, false, selectedColorId))
             Toast.makeText(this, "Task saved successfully!", Toast.LENGTH_SHORT).show()
 
-            val intent = Intent(this, MainActivity::class.java)
-            startActivity(intent)
-            finish()
+            finish() // go back to MainActivity without recreating it
         }
         // If the user long clicks, it's ignored and nothing happens
         backButton.setOnLongClickListener { true }

@@ -29,7 +29,8 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <!--    Search Bar - styled with material outlinedbox-->
+    <!--    Search Bar - styled with material outlined-box
+    Should use hint - not queryHint as per android guidelines-->
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/searchLayout"
         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
@@ -41,7 +42,10 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/headerText"
         app:startIconDrawable="@android:drawable/ic_menu_search"
-        app:startIconTint="@color/meadow_accent_dark">
+        app:startIconTint="@color/meadow_accent_dark"
+        app:endIconMode="clear_text"
+        app:endIconTint="@color/meadow_accent_dark"
+        >
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/searchInput"
