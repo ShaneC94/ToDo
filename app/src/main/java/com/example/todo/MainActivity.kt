@@ -36,9 +36,6 @@ class MainActivity : AppCompatActivity() {
         recyclerView.adapter = adapter
         recyclerView.layoutManager = LinearLayoutManager(this)
 
-
-        //handles typing in the search bar
-        //if empty - show all tasks, else filter
         searchInput.addTextChangedListener(object:TextWatcher {
             override fun beforeTextChanged(s: CharSequence?,
                                            start: Int,
