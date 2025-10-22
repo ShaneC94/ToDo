@@ -20,7 +20,7 @@
         android:layout_marginTop="56dp"
         android:gravity="center"
         android:padding="16dp"
-        android:text="My ToDo App"
+        android:text="@string/app_name"
         android:textColor="@color/main_text"
         android:textSize="18sp"
         android:textStyle="bold"
@@ -29,23 +29,19 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <!--    Search Bar - styled with material outlined-box
-    Should use hint - not queryHint as per android guidelines -->
+    <!--    Search Bar - styled with material outlinedbox-->
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/searchLayout"
         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_margin="16dp"
+        android:hint="@string/searchHint"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        android:hint="Search your tasks"
         app:layout_constraintTop_toBottomOf="@+id/headerText"
         app:startIconDrawable="@android:drawable/ic_menu_search"
-        app:startIconTint="@color/meadow_accent_dark"
-        app:endIconMode="clear_text"
-        app:endIconTint="@color/meadow_accent_dark"
-        >
+        app:startIconTint="@color/meadow_accent_dark">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/searchInput"
@@ -78,13 +74,13 @@ more efficient than manually adding them-->
         android:id="@+id/taskFab"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="36dp"
-        android:layout_marginBottom="48dp"
-        android:contentDescription="Add Task"
+        android:contentDescription="@string/addtaskHint"
         android:src="@android:drawable/ic_input_add"
         android:tint="@color/white"
-        app:backgroundTint="@color/meadow_green"
+        app:backgroundTint="@color/meadow_accent_dark"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        android:layout_margin="36dp"
+        />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

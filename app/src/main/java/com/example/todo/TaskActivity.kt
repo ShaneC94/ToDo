@@ -7,15 +7,20 @@ import android.widget.Button
 import android.widget.RadioGroup
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import com.google.android.material.textfield.TextInputLayout
 import com.google.android.material.textfield.TextInputEditText
+import com.google.android.material.textfield.TextInputLayout
 
 class TaskActivity : AppCompatActivity() {
+
+    private lateinit var dbHelper: TaskDatabaseHelper
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_new_task_generator)
 
-        val deadlineInput = findViewById< TextInputEditText>(R.id.editDeadlineDate)
+        dbHelper = TaskDatabaseHelper(this)
+
+        val deadlineInput = findViewById<TextInputEditText>(R.id.editDeadlineDate)
         val deadlineLayout = findViewById<TextInputLayout>(R.id.deadlineLayout)
         val titleInput = findViewById<TextInputEditText>(R.id.editTitle)
         val titleLayout = findViewById<TextInputLayout>(R.id.titleLayout)
@@ -25,7 +30,6 @@ class TaskActivity : AppCompatActivity() {
         val saveButton = findViewById<Button>(R.id.saveButton)
         val colorGroup = findViewById<RadioGroup>(R.id.colorPickerGroup)
 
-        // Live color change on the input boxes
         colorGroup.setOnCheckedChangeListener { _, checkedId ->
             val selectedColorId = when (checkedId) {
                 R.id.colorBlue -> R.color.task_blue
@@ -34,52 +38,39 @@ class TaskActivity : AppCompatActivity() {
                 R.id.colorOrange -> R.color.task_orange
                 else -> R.color.meadow_beige
             }
-
             val color = getColor(selectedColorId)
-
             titleLayout.setBoxBackgroundColor(color)
             deadlineLayout.setBoxBackgroundColor(color)
             descriptionLayout.setBoxBackgroundColor(color)
         }
 
-        // Modal Date Picker
         deadlineLayout.setEndIconOnClickListener {
             val calendar = Calendar.getInstance()
-            val year = calendar.get(Calendar.YEAR)
-            val month = calendar.get(Calendar.MONTH)
-            val day = calendar.get(Calendar.DAY_OF_MONTH)
-
-            //opens with today's date as default
-            val datePicker = DatePickerDialog(this, {_, selYear, selMonth, selDay ->
-                val selectedDate = "${selYear}/${selMonth + 1}/${selDay}"
-                deadlineInput.setText(selectedDate)
-            }, year, month, day)
+            val datePicker = DatePickerDialog(
+                this,
+                { _, year, month, day ->
+                    val selectedDate = "$year/${month + 1}/$day"
+                    deadlineInput.setText(selectedDate)
+                },
+                calendar.get(Calendar.YEAR),
+                calendar.get(Calendar.MONTH),
+                calendar.get(Calendar.DAY_OF_MONTH)
+            )
             datePicker.show()
         }
-        // The user does a normal click and is navigated back without saving
-        backButton.setOnClickListener {
-            finish() // go back to MainActivity without recreating it
-        }
-        // The user does a normal click and is navigated back with saving
-        //and task generation
+
+        backButton.setOnClickListener { finish() }
+
         saveButton.setOnClickListener {
-            val taskTitle = titleInput.text.toString().trim()
-            if (taskTitle.isEmpty()) {
-                titleInput.error = "A title is required"
+            val title = titleInput.text.toString().trim()
+            if (title.isEmpty()) {
+                titleInput.error = "Title is required"
                 Toast.makeText(this, "Title is required!", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
-            val taskDeadline = if (deadlineInput.text.toString().trim().isEmpty()) {
-                "No deadline"
-            } else {
-                deadlineInput.text.toString().trim()
-            }
-            val taskDescription = if (descriptionInput.text.toString().trim().isEmpty()) {
-                "No description"
-            } else {
-                descriptionInput.text.toString().trim()
-            }
 
+            val deadline = if (deadlineInput.text.toString().trim().isEmpty()) "No deadline" else deadlineInput.text.toString().trim()
+            val description = if (descriptionInput.text.toString().trim().isEmpty()) "No description" else descriptionInput.text.toString().trim()
             val selectedColorId = when (colorGroup.checkedRadioButtonId) {
                 R.id.colorBlue -> R.color.task_blue
                 R.id.colorYellow -> R.color.task_yellow
@@ -88,13 +79,15 @@ class TaskActivity : AppCompatActivity() {
                 else -> R.color.meadow_beige
             }
 
-            MainActivity.tasks.add(Task(taskTitle, taskDeadline, taskDescription, false, selectedColorId))
-            Toast.makeText(this, "Task saved successfully!", Toast.LENGTH_SHORT).show()
+            val task = Task(title, deadline, description, false, selectedColorId)
+            val success = dbHelper.insertTask(task)
 
-            finish() // go back to MainActivity without recreating it
+            if (success) {
+                Toast.makeText(this, "Task saved successfully!", Toast.LENGTH_SHORT).show()
+                finish()
+            } else {
+                Toast.makeText(this, "Error saving task.", Toast.LENGTH_SHORT).show()
+            }
         }
-        // If the user long clicks, it's ignored and nothing happens
-        backButton.setOnLongClickListener { true }
-        saveButton.setOnLongClickListener { true }
     }
 }

@@ -1,3 +1,16 @@
 <resources>
-    <string name="app_name">ToDo</string>
+    <string name="app_name">TickedOff</string>
+    <string name="appTitle">My ToDo App</string>
+    <string name="searchHint">Search your tasks</string>
+    <string name="addtaskHint">Add Task</string>
+    <string name="tasktitlePlaceholder">Task Title</string>
+    <string name="deadlinePlaceholder">Deadline: YYYY/MM/DD</string>
+    <string name="descriptionPlaceholder">Task description goes here</string>
+    <string name="tasknameHint">Enter task title</string>
+    <string name="deadlineHint">Enter deadline (YYYY/MM/DD)</string>
+    <string name="descriptionHint">Enter description</string>
+    <string name="saveButton">Save</string>
+    <string name="backButton">Back</string>
+    <string name="save_task">Save task</string>
+    <string name="go_back_without_saving">Go back without saving</string>
 </resources>
