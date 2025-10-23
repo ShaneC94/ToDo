@@ -9,7 +9,8 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 
 class TaskAdapter(
-    private var taskList: List<Task>
+    private var taskList: List<Task>,
+    private val dbHelper: TaskDatabaseHelper
 ) : RecyclerView.Adapter<TaskAdapter.TaskViewHolder>() {
 
     //tracks which item is expanded - allows for both to expand individually
@@ -73,17 +74,12 @@ class TaskAdapter(
         }
 
         //toggle description click listener
-        holder.description.setOnClickListener {
-            if (expandedDescriptions.contains(position)) {
-                expandedDescriptions.remove(position)
-            } else {
-                expandedDescriptions.add(position)
-            }
-            notifyItemChanged(position)
-        }
-
+        // Persist checkbox change
+        holder.checkBox.setOnCheckedChangeListener(null) // avoid triggering on reuse
+        holder.checkBox.isChecked = task.isDone
         holder.checkBox.setOnCheckedChangeListener { _, isChecked ->
             task.isDone = isChecked
+            dbHelper.updateTaskStatus(task.title, isChecked)
         }
     }
     //tells recyclerview how many tasks exist
@@ -96,6 +92,4 @@ class TaskAdapter(
         expandedDescriptions.clear()
         notifyDataSetChanged()
     }
-
-
 }
