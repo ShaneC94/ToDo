@@ -59,7 +59,10 @@ class EditTaskActivity: AppCompatActivity() {
         }
         colorGroup.check(colorButtonId)
 
-
+        val initialColor = getColor(existingTask.colorResId)
+        titleLayout.boxBackgroundColor = initialColor
+        deadlineLayout.boxBackgroundColor = initialColor
+        descriptionLayout.boxBackgroundColor = initialColor
 
         // Live color change on the input boxes
         colorGroup.setOnCheckedChangeListener { _, checkedId ->
