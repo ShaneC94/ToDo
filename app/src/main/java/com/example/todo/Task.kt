@@ -6,5 +6,7 @@ data class Task(
     val deadline: String,
     val description: String,
     var isDone: Boolean = false,
-    val colorResId: Int = R.color.meadow_beige // default task color
+    val colorResId: Int = R.color.meadow_beige, // default task color
+    val imageUri: String? = null
+
 )

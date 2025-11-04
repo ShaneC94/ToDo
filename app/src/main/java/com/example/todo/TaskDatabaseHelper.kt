@@ -11,7 +11,7 @@ class TaskDatabaseHelper(context: Context): SQLiteOpenHelper(context, DATABASE_N
     //static object that applies to the class
     companion object{
         private const val DATABASE_NAME = "tasks.db"
-        private const val DATABASE_VERSION = 1
+        private const val DATABASE_VERSION = 3
         private const val TABLE_NAME = "tasks"
 
         //Column names
@@ -21,6 +21,7 @@ class TaskDatabaseHelper(context: Context): SQLiteOpenHelper(context, DATABASE_N
         private const val COLUMN_DEADLINE = "deadline"
         private const val COLUMN_COLOR = "color"
         private const val COLUMN_IS_DONE = "is_done"
+        private const val COLUMN_IMAGE_URI = "image_uri"
     }
 
 
@@ -34,7 +35,8 @@ class TaskDatabaseHelper(context: Context): SQLiteOpenHelper(context, DATABASE_N
                 $COLUMN_DESCRIPTION TEXT,
                 $COLUMN_DEADLINE TEXT,
                 $COLUMN_COLOR INTEGER,
-                $COLUMN_IS_DONE INTEGER
+                $COLUMN_IS_DONE INTEGER,
+                $COLUMN_IMAGE_URI TEXT
             )
         """.trimIndent()
         //execSQL executes the query to create the database table
@@ -59,6 +61,7 @@ class TaskDatabaseHelper(context: Context): SQLiteOpenHelper(context, DATABASE_N
             put(COLUMN_DEADLINE, task.deadline)
             put(COLUMN_COLOR, task.colorResId)
             put(COLUMN_IS_DONE, if (task.isDone) 1 else 0)
+            put(COLUMN_IMAGE_URI, task.imageUri)
         }
         //inserts the ContentValues object into the database table
         val id = db.insert(TABLE_NAME, null, values)
@@ -87,7 +90,8 @@ class TaskDatabaseHelper(context: Context): SQLiteOpenHelper(context, DATABASE_N
                     description = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_DESCRIPTION)),
                     deadline = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_DEADLINE)),
                     colorResId = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_COLOR)),
-                    isDone = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_IS_DONE)) == 1
+                    isDone = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_IS_DONE)) == 1,
+                    imageUri = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_IMAGE_URI))
                 )
                 taskList.add(task)
             } while (cursor.moveToNext())
@@ -108,7 +112,8 @@ class TaskDatabaseHelper(context: Context): SQLiteOpenHelper(context, DATABASE_N
                 description = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_DESCRIPTION)),
                 deadline = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_DEADLINE)),
                 colorResId = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_COLOR)),
-                isDone = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_IS_DONE)) == 1
+                isDone = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_IS_DONE)) == 1,
+                imageUri = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_IMAGE_URI))
             )
         }
         cursor.close()
@@ -124,6 +129,7 @@ class TaskDatabaseHelper(context: Context): SQLiteOpenHelper(context, DATABASE_N
             put(COLUMN_DEADLINE, task.deadline)
             put(COLUMN_COLOR, task.colorResId)
             put(COLUMN_IS_DONE, if (task.isDone) 1 else 0)
+            put(COLUMN_IMAGE_URI, task.imageUri)
         }
     db.update(TABLE_NAME, values, "$COLUMN_ID = ?", arrayOf(task.id.toString()))
     db.close()

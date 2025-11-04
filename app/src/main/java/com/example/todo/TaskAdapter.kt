@@ -1,15 +1,19 @@
 package com.example.todo
 
 import android.content.Intent
+import android.net.Uri
 import android.text.TextUtils
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.CheckBox
 import android.widget.ImageButton
+import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
+import java.io.File
+import androidx.core.net.toUri
 
 class TaskAdapter(
     private var taskList: List<Task>
@@ -31,6 +35,7 @@ class TaskAdapter(
         val description: TextView = itemView.findViewById(R.id.taskDescription)
         val deleteButton: ImageButton = itemView.findViewById(R.id.imageButton)
         val editButton: ImageButton = itemView.findViewById(R.id.editbutton)
+        val imagePreview: ImageView = itemView.findViewById(R.id.taskImagePreview)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TaskViewHolder {
@@ -52,6 +57,22 @@ class TaskAdapter(
         holder.description.text = task.description
         holder.checkBox.isChecked = task.isDone
         holder.checkBox.setOnCheckedChangeListener(null) //clear previous listener
+
+        // Dynamically show/hide image preview
+        if (!task.imageUri.isNullOrEmpty()) {
+            try {
+                val uri = task.imageUri.toUri()
+                holder.imagePreview.setImageURI(uri)
+                holder.imagePreview.visibility = View.VISIBLE
+            } catch (e: Exception) {
+                e.printStackTrace()
+                holder.imagePreview.setImageDrawable(null)
+                holder.imagePreview.visibility = View.GONE
+            }
+        } else {
+            holder.imagePreview.setImageDrawable(null)
+            holder.imagePreview.visibility = View.GONE
+        }
 
         holder.checkBox.setOnCheckedChangeListener { _, isChecked ->
             task.isDone = isChecked
