@@ -15,6 +15,7 @@ places the checkbox and task info side by side -->
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
+        android:gravity="center_vertical"
         android:padding="16dp">
 
         <CheckBox
@@ -24,9 +25,11 @@ places the checkbox and task info side by side -->
 <!--inner linear layout
 places the task info vertically, title, date, description -->
         <LinearLayout
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_weight="1"
             android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
             android:orientation="vertical">
 
             <TextView
@@ -62,6 +65,30 @@ places the task info vertically, title, date, description -->
                 android:singleLine="false"/>
 
         </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center">
+
+            <ImageButton
+                android:id="@+id/editbutton"
+                android:layout_width="92dp"
+                android:layout_height="66dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:src="@drawable/baseline_build_24" />
+
+
+        <ImageButton
+            android:id="@+id/imageButton"
+            android:layout_width="92dp"
+            android:layout_height="66dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="Delete Task"
+            android:src="@drawable/ic_delete" />
+        </LinearLayout>
     </LinearLayout>
+
 
 </androidx.cardview.widget.CardView>

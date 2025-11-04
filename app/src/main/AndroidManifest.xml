@@ -24,6 +24,11 @@
             </intent-filter>
         </activity>
 
+        <activity
+            android:name=".EditTaskActivity"
+            android:exported="false" />
+
+
     </application>
 
 </manifest>

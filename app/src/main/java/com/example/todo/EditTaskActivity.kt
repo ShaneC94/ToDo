@@ -1,6 +1,7 @@
 package com.example.todo
 
 import android.app.DatePickerDialog
+import android.content.Intent
 import android.icu.util.Calendar
 import android.os.Bundle
 import android.widget.Button
@@ -9,10 +10,9 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
-
-class TaskActivity : AppCompatActivity() {
-
+class EditTaskActivity: AppCompatActivity() {
     private lateinit var dbHelper: TaskDatabaseHelper
+    private var taskId: Long = -1
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -31,6 +31,36 @@ class TaskActivity : AppCompatActivity() {
         val saveButton = findViewById<Button>(R.id.saveButton)
         val colorGroup = findViewById<RadioGroup>(R.id.colorPickerGroup)
 
+        //get task id from intent
+        taskId = intent.getLongExtra("TASK_ID", -1L)
+        if (taskId == -1L) {
+            Toast.makeText(this, "Invalid task ID", Toast.LENGTH_SHORT).show()
+            finish()
+            return
+        }
+
+        val existingTask = dbHelper.getTaskById(taskId)
+        if (existingTask == null) {
+            Toast.makeText(this, "Task not found in database", Toast.LENGTH_SHORT).show()
+            finish()
+            return
+        }
+        //put all the data in the input boxes
+        titleInput.setText(existingTask?.title)
+        deadlineInput.setText(if (existingTask?.deadline == "No deadline") "" else existingTask?.deadline)
+        descriptionInput.setText(if (existingTask?.description == "No description") "" else existingTask?.description)
+
+        val colorButtonId = when (existingTask?.colorResId) {
+            R.color.task_blue -> R.id.colorBlue
+            R.color.task_yellow -> R.id.colorYellow
+            R.color.task_pink -> R.id.colorPink
+            R.color.task_orange -> R.id.colorOrange
+            else -> R.id.colorBlue
+        }
+        colorGroup.check(colorButtonId)
+
+
+
         // Live color change on the input boxes
         colorGroup.setOnCheckedChangeListener { _, checkedId ->
             val selectedColorId = when (checkedId) {
@@ -43,9 +73,9 @@ class TaskActivity : AppCompatActivity() {
 
             val color = getColor(selectedColorId)
 
-            titleLayout.setBoxBackgroundColor(color)
-            deadlineLayout.setBoxBackgroundColor(color)
-            descriptionLayout.setBoxBackgroundColor(color)
+            titleLayout.boxBackgroundColor = color
+            deadlineLayout.boxBackgroundColor = color
+            descriptionLayout.boxBackgroundColor = color
         }
 
         // Modal Date Picker
@@ -94,20 +124,22 @@ class TaskActivity : AppCompatActivity() {
                 else -> R.color.meadow_beige
             }
 
-            if(taskTitle.isNotEmpty()){
-                val newTask = Task(
+
+                val updatedTask = Task(
+                    id = taskId,
                     title = taskTitle,
                     deadline = taskDeadline,
                     description = taskDescription,
-                    colorResId = selectedColorId
+                    colorResId = selectedColorId,
+                    isDone = existingTask.isDone
                 )
-                dbHelper.addTask(newTask) //add the new task
-            }
+                dbHelper.updateTask(updatedTask) //update the task
+
 
 
 
             Toast.makeText(this, "Task saved successfully!", Toast.LENGTH_SHORT).show()
-
+            setResult(RESULT_OK, Intent())
             finish() // go back to MainActivity without recreating it
         }
         // If the user long clicks, it's ignored and nothing happens

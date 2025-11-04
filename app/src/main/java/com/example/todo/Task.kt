@@ -1,6 +1,7 @@
 package com.example.todo
 
-data class Task (
+data class Task(
+    val id: Long=-1,
     val title: String,
     val deadline: String,
     val description: String,

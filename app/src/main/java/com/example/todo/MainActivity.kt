@@ -2,23 +2,25 @@ package com.example.todo
 
 import android.content.Intent
 import android.os.Bundle
-import android.widget.EditText
-import androidx.recyclerview.widget.RecyclerView
-import androidx.recyclerview.widget.LinearLayoutManager
 import android.text.Editable
 import android.text.TextWatcher
+import android.widget.Button
+import android.widget.EditText
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 
 class MainActivity : AppCompatActivity() {
-//    acts like in-memory storage - making shared task list accessible
-    companion object {
-        val tasks = mutableListOf<Task>()
-    }
 
     private lateinit var adapter: TaskAdapter //initialized later in onCreate
+    private lateinit var dbHelper: TaskDatabaseHelper //initialized later in onCreate
+    private var allTasks = listOf<Task>() //holds all tasks
+
+
+
 
     //init, set layout, UI configuration
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -26,30 +28,39 @@ class MainActivity : AppCompatActivity() {
         enableEdgeToEdge()
         setContentView(R.layout.activity_main)
 
+        dbHelper = TaskDatabaseHelper(this) //define helper here
         //connect xml views to kotlin var
         val searchInput = findViewById<EditText>(R.id.searchInput)
         val fab = findViewById<FloatingActionButton>(R.id.taskFab)
         val recyclerView = findViewById<RecyclerView>(R.id.taskRecyclerView)
 
         //recyclerview setup
-        adapter = TaskAdapter(tasks)
-        recyclerView.adapter = adapter
         recyclerView.layoutManager = LinearLayoutManager(this)
+        adapter = TaskAdapter(emptyList())
+        recyclerView.adapter = adapter
 
-        searchInput.addTextChangedListener(object:TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?,
-                                           start: Int,
-                                           count: Int,
-                                           after: Int) {}
-            override fun onTextChanged(s: CharSequence?,
-                                       start: Int,
-                                       count: Int,
-                                       after: Int) {
+        //search functionality
+
+        searchInput.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(
+                s: CharSequence?,
+                start: Int,
+                count: Int,
+                after: Int
+            ) {
+            }
+
+            override fun onTextChanged(
+                s: CharSequence?,
+                start: Int,
+                count: Int,
+                after: Int
+            ) {
                 val query = s.toString().trim()
                 val filtered = if (query.isEmpty()) {
-                    tasks
+                    allTasks //show all tasks
                 } else {
-                    tasks.filter {it.title.contains(query, ignoreCase = true)}
+                    allTasks.filter { it.title.contains(query, ignoreCase = true) }
                 }
                 adapter.updateList(filtered)
             }
@@ -64,8 +75,11 @@ class MainActivity : AppCompatActivity() {
         }
 
     }
-    override fun onResume(){
+
+    override fun onResume() {
         super.onResume()
-        adapter.updateList(tasks) //shows all the tasks by default
+        //pull from database
+        allTasks = dbHelper.getAllTasks()
+        adapter.updateList(allTasks) //shows all the tasks by default
     }
 }
