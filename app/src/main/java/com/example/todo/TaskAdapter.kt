@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import android.widget.CheckBox
 import android.widget.ImageButton
 import android.widget.TextView
+import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 
 class TaskAdapter(
@@ -62,6 +63,13 @@ class TaskAdapter(
             dbHelper.deleteTask(task.id)//delete the task
             val newList = dbHelper.getAllTasks()//create new list
             updateList(newList)//update the list
+
+            //show toast confirmation
+            Toast.makeText(
+            holder.itemView.context,
+            "Task deleted!",
+            Toast.LENGTH_SHORT
+            ).show()
         }
 
         holder.editButton.setOnClickListener {
