@@ -99,14 +99,14 @@ class EditTaskActivity: AppCompatActivity() {
         val saveButton = findViewById<Button>(R.id.saveButton)
         val colorGroup = findViewById<RadioGroup>(R.id.colorPickerGroup)
 
-        // 🖼️ Initialize image & button views first
+        // Initialize image & button views first
         imageView = findViewById(R.id.taskImageView)
         cameraButton = findViewById(R.id.cameraButton)
         galleryButton = findViewById(R.id.galleryButton)
         removeImageButton = findViewById(R.id.removeImageButton)
         imageView.visibility = View.GONE
 
-// ✅ Now the listeners
+        // Now the listeners
         cameraButton.setOnClickListener {
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
                 == PackageManager.PERMISSION_GRANTED) {
