@@ -1,7 +1,6 @@
 package com.example.todo
 
 import android.content.Intent
-import android.net.Uri
 import android.text.TextUtils
 import android.view.LayoutInflater
 import android.view.View
@@ -12,7 +11,6 @@ import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
-import java.io.File
 import androidx.core.net.toUri
 
 class TaskAdapter(

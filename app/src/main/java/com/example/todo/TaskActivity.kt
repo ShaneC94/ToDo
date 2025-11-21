@@ -1,6 +1,10 @@
 package com.example.todo
 
 import android.app.DatePickerDialog
+import android.hardware.Sensor
+import android.hardware.SensorEvent
+import android.hardware.SensorEventListener
+import android.hardware.SensorManager
 import android.icu.util.Calendar
 import android.os.Bundle
 import android.widget.Button
@@ -25,17 +29,28 @@ import java.io.File
 import java.io.FileOutputStream
 import androidx.core.graphics.createBitmap
 
-class TaskActivity : AppCompatActivity() {
+class TaskActivity : AppCompatActivity(), SensorEventListener {
 
     private lateinit var dbHelper: TaskDatabaseHelper
     private lateinit var imageView: ImageView
     private var imageUri: String? = null
+
+    //Light Sensor variables
+    private lateinit var sensorManager: SensorManager
+    private var lightSensor: Sensor? = null
+    private lateinit var rootLayout: View
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_new_task_generator)
 
         dbHelper = TaskDatabaseHelper(this) // define dbHelper object
+
+        // Light sensor setup
+        sensorManager = getSystemService(SENSOR_SERVICE) as SensorManager
+        lightSensor = sensorManager.getDefaultSensor(Sensor.TYPE_LIGHT)
+
+        rootLayout = findViewById(R.id.taskScreen)
 
         val deadlineInput = findViewById<TextInputEditText>(R.id.editDeadlineDate)
         val deadlineLayout = findViewById<TextInputLayout>(R.id.deadlineLayout)
@@ -54,7 +69,7 @@ class TaskActivity : AppCompatActivity() {
         val removeImageButton = findViewById<Button>(R.id.removeImageButton)
         imageView.visibility = View.GONE
 
-        // --- Camera and Gallery Logic ---
+        // Camera and Gallery Logic
         val takePicture = registerForActivityResult(ActivityResultContracts.TakePicturePreview()) { bitmap ->
             bitmap?.let {
                 val scaledBitmap = scaleCenterCrop(it, 800, 800)
@@ -159,7 +174,6 @@ class TaskActivity : AppCompatActivity() {
         }
 
         // The user does a normal click and is navigated back with saving
-        // and task generation
         saveButton.setOnClickListener {
             val taskTitle = titleInput.text.toString().trim()
             if (taskTitle.isEmpty()) {
@@ -190,7 +204,7 @@ class TaskActivity : AppCompatActivity() {
                     colorResId = selectedColorId,
                     imageUri = imageUri // store image path
                 )
-                dbHelper.addTask(newTask) // add the new task
+                dbHelper.addTask(newTask)
             }
 
             Toast.makeText(this, "Task saved successfully!", Toast.LENGTH_SHORT).show()
@@ -201,6 +215,40 @@ class TaskActivity : AppCompatActivity() {
         backButton.setOnLongClickListener { true }
         saveButton.setOnLongClickListener { true }
     }
+
+    override fun onResume() {
+        super.onResume()
+
+        // register light listener
+        lightSensor?.also {
+            sensorManager.registerListener(this, it, SensorManager.SENSOR_DELAY_NORMAL)
+        }
+    }
+
+    override fun onPause() {
+        super.onPause()
+        // unregister sensor
+        sensorManager.unregisterListener(this)
+    }
+
+    override fun onSensorChanged(event: SensorEvent?) {
+        if (event?.sensor?.type == Sensor.TYPE_LIGHT) {
+            val lux = event.values[0]
+
+            val colorRes = when {
+                lux < 100 -> R.color.meadow_dark_olive
+                lux in 100.0..2000.0 -> R.color.meadow_dim_green
+                lux in 2001.0..7500.0 -> R.color.meadow_soft_gold
+                lux in 7501.0..10000.0 -> R.color.meadow_sky_blue
+                else -> R.color.meadow_light_bg
+            }
+
+            rootLayout.setBackgroundColor(getColor(colorRes))
+        }
+    }
+
+
+    override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {}
 
     private fun scaleCenterCrop(source: Bitmap, newWidth: Int, newHeight: Int): Bitmap {
         val scale: Float

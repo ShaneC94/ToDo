@@ -24,11 +24,15 @@ import java.io.FileOutputStream
 import android.widget.ImageView
 import android.view.View
 import android.content.pm.PackageManager
+import androidx.core.net.toUri
+import androidx.core.graphics.createBitmap
+import android.hardware.Sensor
+import android.hardware.SensorEvent
+import android.hardware.SensorEventListener
+import android.hardware.SensorManager
 
+class EditTaskActivity: AppCompatActivity(), SensorEventListener {
 
-
-
-class EditTaskActivity: AppCompatActivity() {
     private lateinit var dbHelper: TaskDatabaseHelper
     private var taskId: Long = -1
     // Image handling
@@ -39,6 +43,10 @@ class EditTaskActivity: AppCompatActivity() {
     private lateinit var galleryButton: Button
     private lateinit var removeImageButton: Button
 
+    //Light sensor variables
+    private lateinit var sensorManager: SensorManager
+    private var lightSensor: Sensor? = null
+    private lateinit var rootLayout: View
 
     private val takePicture = registerForActivityResult(ActivityResultContracts.TakePicturePreview()) { bitmap: Bitmap? ->
         bitmap?.let {
@@ -80,14 +88,16 @@ class EditTaskActivity: AppCompatActivity() {
         }
     }
 
-
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_new_task_generator)
 
         dbHelper = TaskDatabaseHelper(this)//define dbHelper object
 
+        //Light sensor setup
+        sensorManager = getSystemService(SENSOR_SERVICE) as SensorManager
+        lightSensor = sensorManager.getDefaultSensor(Sensor.TYPE_LIGHT)
+        rootLayout = findViewById(R.id.taskScreen)
 
         val deadlineInput = findViewById<TextInputEditText>(R.id.editDeadlineDate)
         val deadlineLayout = findViewById<TextInputLayout>(R.id.deadlineLayout)
@@ -131,8 +141,6 @@ class EditTaskActivity: AppCompatActivity() {
             }
         }
 
-
-
         //get task id from intent
         taskId = intent.getLongExtra("TASK_ID", -1L)
         if (taskId == -1L) {
@@ -153,13 +161,12 @@ class EditTaskActivity: AppCompatActivity() {
             displayImageFromUriString(imageUri)
         }
 
-
         //put all the data in the input boxes
-        titleInput.setText(existingTask?.title)
-        deadlineInput.setText(if (existingTask?.deadline == "No deadline") "" else existingTask?.deadline)
-        descriptionInput.setText(if (existingTask?.description == "No description") "" else existingTask?.description)
+        titleInput.setText(existingTask.title)
+        deadlineInput.setText(if (existingTask.deadline == "No deadline") "" else existingTask.deadline)
+        descriptionInput.setText(if (existingTask.description == "No description") "" else existingTask.description)
 
-        val colorButtonId = when (existingTask?.colorResId) {
+        val colorButtonId = when (existingTask.colorResId) {
             R.color.task_blue -> R.id.colorBlue
             R.color.task_yellow -> R.id.colorYellow
             R.color.task_pink -> R.id.colorPink
@@ -204,12 +211,13 @@ class EditTaskActivity: AppCompatActivity() {
             }, year, month, day)
             datePicker.show()
         }
+
         // The user does a normal click and is navigated back without saving
         backButton.setOnClickListener {
             finish() // go back to MainActivity without recreating it
         }
+
         // The user does a normal click and is navigated back with saving
-        //and task generation
         saveButton.setOnClickListener {
             val taskTitle = titleInput.text.toString().trim()
             if (taskTitle.isEmpty()) {
@@ -217,15 +225,11 @@ class EditTaskActivity: AppCompatActivity() {
                 Toast.makeText(this, "Title is required!", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
-            val taskDeadline = if (deadlineInput.text.toString().trim().isEmpty()) {
+            val taskDeadline = deadlineInput.text.toString().trim().ifEmpty {
                 "No deadline"
-            } else {
-                deadlineInput.text.toString().trim()
             }
-            val taskDescription = if (descriptionInput.text.toString().trim().isEmpty()) {
+            val taskDescription = descriptionInput.text.toString().trim().ifEmpty {
                 "No description"
-            } else {
-                descriptionInput.text.toString().trim()
             }
 
             val selectedColorId = when (colorGroup.checkedRadioButtonId) {
@@ -235,7 +239,6 @@ class EditTaskActivity: AppCompatActivity() {
                 R.id.colorOrange -> R.color.task_orange
                 else -> R.color.meadow_beige
             }
-
 
             val updatedTask = Task(
                 id = taskId,
@@ -247,29 +250,49 @@ class EditTaskActivity: AppCompatActivity() {
                 imageUri = imageUri
             )
 
-            dbHelper.updateTask(updatedTask) //update the task
-
-
-
-
+            dbHelper.updateTask(updatedTask)
             Toast.makeText(this, "Task saved successfully!", Toast.LENGTH_SHORT).show()
             setResult(RESULT_OK, Intent())
             finish() // go back to MainActivity without recreating it
         }
+
         // If the user long clicks, it's ignored and nothing happens
         backButton.setOnLongClickListener { true }
         saveButton.setOnLongClickListener { true }
     }
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (requestCode == 100) {
-            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                takePicture.launch(null)
-            } else {
-                Toast.makeText(this, "Camera permission is required to take photos", Toast.LENGTH_SHORT).show()
-            }
+
+    override fun onResume() {
+        super.onResume()
+        // register light sensor listener
+        lightSensor?.also {
+            sensorManager.registerListener(this, it, SensorManager.SENSOR_DELAY_NORMAL)
         }
     }
+
+    override fun onPause() {
+        super.onPause()
+        sensorManager.unregisterListener(this)
+    }
+
+    override fun onSensorChanged(event: SensorEvent?) {
+        if (event?.sensor?.type == Sensor.TYPE_LIGHT) {
+            val lux = event.values[0]
+
+            val colorRes = when {
+                lux < 100 -> R.color.meadow_dark_olive
+                lux in 100.0..2000.0 -> R.color.meadow_dim_green
+                lux in 2001.0..7500.0 -> R.color.meadow_soft_gold
+                lux in 7501.0..10000.0 -> R.color.meadow_sky_blue
+                else -> R.color.meadow_light_bg
+            }
+
+            rootLayout.setBackgroundColor(getColor(colorRes))
+        }
+    }
+
+
+    override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {}
+
     private fun displayImageFromUriString(uriString: String?) {
         if (uriString.isNullOrEmpty()) {
             imageView.setImageDrawable(null)
@@ -279,7 +302,7 @@ class EditTaskActivity: AppCompatActivity() {
         try {
             val toShow: Uri = when {
                 uriString.startsWith("content://") || uriString.startsWith("file://") || uriString.startsWith("http") -> {
-                    Uri.parse(uriString)
+                    uriString.toUri()
                 }
                 else -> {
                     Uri.fromFile(File(uriString))
@@ -293,6 +316,7 @@ class EditTaskActivity: AppCompatActivity() {
             imageView.visibility = View.GONE
         }
     }
+
     private fun scaleCenterCrop(source: Bitmap, newWidth: Int, newHeight: Int): Bitmap {
         val scale: Float
         val dx: Float
@@ -314,12 +338,9 @@ class EditTaskActivity: AppCompatActivity() {
         matrix.setScale(scale, scale)
         matrix.postTranslate(dx, dy)
 
-        val result = Bitmap.createBitmap(newWidth, newHeight, Bitmap.Config.ARGB_8888)
+        val result = createBitmap(newWidth, newHeight)
         val canvas = android.graphics.Canvas(result)
         canvas.drawBitmap(source, matrix, null)
         return result
     }
-
-
-
 }

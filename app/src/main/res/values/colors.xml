@@ -6,12 +6,19 @@
     <color name="meadow_olive">#B7C9A8</color>
     <color name="meadow_accent_dark">#4F6D7A</color>
     <color name="meadow_beige">#D6CFC4</color>
+    <color name="meadow_dark_olive">#4E5A32</color>   <!-- very dark -->
+    <color name="meadow_dim_green">#7C8B55</color>    <!-- dim light -->
+    <color name="meadow_soft_gold">#D2C97A</color>    <!-- medium light -->
+    <color name="meadow_sky_blue">#BFD7E3</color>     <!-- bright -->
 
 <!--    Extra Colors-->
     <color name="task_blue">#7BAFD4</color>
     <color name="task_yellow">#EFD780</color>
     <color name="task_pink">#E8A0B3</color>
     <color name="task_orange">#E8B980</color>
+
+<!-- Dark navy for the gradient coloring -->
+    <color name="meadow_dark_navy">#2F3E46</color>
 
     <!--    Text    -->
     <color name="main_text">#2E2E2E</color>
